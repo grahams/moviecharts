@@ -1,0 +1,16 @@
+
+.chart rect {
+    fill: steelblue;
+}
+
+text.valueLabel {
+    fill: white;
+    font: 10px sans-serif;
+    text-anchor: end;
+}
+
+text.nameLabel{
+    fill: black;
+    font: 10px sans-serif;
+    text-anchor: end;
+}

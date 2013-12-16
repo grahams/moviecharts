@@ -8,40 +8,50 @@ var ds = new Miso.Dataset({
 ds.fetch({
     success : function() {
         var data = [];
-        this.countBy("Location").each(function(row){ data.push(row); });
+        this.countBy("Location").each(function(row){ 
+            data.push({name: row.Location, value: +row.count}); 
+        });
 
-        var chart = d3.selectAll('.my-chart').append('svg')
-            .attr('width', 600)
-            .attr('height', function(){ return data.length*25; });
+        var width = 800;
+        var barHeight = 20;
 
-        var scale = d3.scale.linear().domain([0,
-            ds.countBy("Location").max("count")]).range([0,150]);
+        var x = d3.scale.linear().range([0, width]);
+        x.domain([0, d3.max(data, function(d) { 
+            return d.value; 
+        })]);
 
-        chart.selectAll('g')
+        var chart = d3.select(".chart")
+            .attr("width", width)
+            .attr("height", barHeight * data.length);
+
+        var bar = chart.selectAll("g")
             .data(data)
-            .enter()
-            .append('g')
-            .attr('transform', 
-                function(d,i){ return "translate(0," + i*25 + ")"; });            
-        chart.selectAll('g').append('text')
-            .text(function(d){ return d.Location; })
+            .enter().append("g")
+            .attr("transform", function(d, i) { 
+                return "translate(0," + i * barHeight + ")"; 
+            });
+
+        bar.append('text')
+            .text(function(d){ return d.name; })
             .attr('text-anchor', 'end')
             .attr('height', 25)
-            .attr('x', 200)
-            .attr('y', 20);
+            .attr('class', 'nameLabel')
+            .attr("dy", ".35em")
+            .attr('x', 190)
+            .attr("y", barHeight / 2);
 
-        chart.selectAll('g').append('rect')
-            .attr('fill', 'blue')
-            .attr('height', 23)
-            .attr('width', function(d){ return scale(d.count); })
-            .attr('x', 210)
-            .attr('y', 2);
+        bar.append("rect")
+            .attr("width", function(d) { return x(d.value); })
+            .attr("height", barHeight - 1)
+            .attr("x", 200);
 
-        chart.selectAll('g').append('text')
-            .text(function(d){ return d.count; })
-            .attr('height', 25)
-            .attr('x', function(d){ return scale(d.count) + 215; })
-            .attr('y', 20);
+        bar.append("text")
+            .attr("x", function(d) { return x(d.value) + 200 - 3; })
+            .attr("y", barHeight / 2)
+            .attr('class', 'valueLabel')
+            .attr("dy", ".35em")
+            .text(function(d) { return d.value; });
+
     },
     error : function() {
         // Data loading failed
