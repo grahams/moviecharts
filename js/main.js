@@ -8,9 +8,24 @@ var ds = new Miso.Dataset({
 ds.fetch({
     success : function() {
         var data = [];
+
+        // Experimented with collapsing small values into an "Other"
+        // category.
+        var otherThreshold = 0;
+        var otherCount = 0;
+
         this.countBy("Location").each(function(row){ 
-            data.push({name: row.Location, value: +row.count}); 
+            if(row.count > otherThreshold) {
+                data.push({name: row.Location, value: +row.count}); 
+            }
+            else {
+                otherCount += row.count;
+            }
         });
+
+        if(otherCount > 0) {
+            data.push({name: "Other", value: otherCount}); 
+        }
 
         var width = 800;
         var barHeight = 20;
@@ -21,8 +36,8 @@ ds.fetch({
         })]);
 
         var chart = d3.select(".chart")
-            .attr("width", width)
-            .attr("height", barHeight * data.length);
+            .attr("width", "100%")
+            .attr("height", "100%");
 
         var bar = chart.selectAll("g")
             .data(data)
