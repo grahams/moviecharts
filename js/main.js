@@ -31,28 +31,26 @@ ds.fetch({
             categories.push("Other");
         }
 
-        $(function () { 
-            $('#container').highcharts({
-                chart: {
-                    type: 'bar'
-                },
+        $('#container').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Theatre Frequency'
+            },
+            xAxis: {
+                categories: categories
+            },
+            yAxis: {
                 title: {
-                    text: 'Theatre Frequency'
-                },
-                xAxis: {
-                    categories: categories
-                },
-                yAxis: {
-                    title: {
-                        text: 'Number of Visits'
-                    }
-                },
-                series: [{
-                    data: data,
-                    name: "Visits",
-                    showInLegend: false
-                }]
-            });
+                    text: 'Number of Visits'
+                }
+            },
+            series: [{
+                data: data,
+                name: "Visits",
+                showInLegend: false
+            }]
         });
     },
     error : function() {
