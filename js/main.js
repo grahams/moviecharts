@@ -65,6 +65,7 @@ var createPieChart = function(container, title, seriesName) {
         yAxis: {
         },
         legend: {
+            enabled: false,
             align: "center",
             itemWidth: 200,
             width: 200,
