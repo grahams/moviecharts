@@ -57,8 +57,6 @@ var createPieChart = function(container, title, seriesName) {
         chart: {
             renderTo: container,
             height: 600,
-            marginBottom: 150,
-            spacingBottom: 200,
             type: 'pie'
         },
         title: {
