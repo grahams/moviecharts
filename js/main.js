@@ -1,5 +1,6 @@
 
 var theatreChart = null;
+var formatChart = null;
 var firstChart = null;
 var genreChart = null;
 var monthChart = null;
@@ -8,18 +9,21 @@ var ds = new Miso.Dataset({
     importer: Miso.Dataset.Importers.GoogleSpreadsheet,
     parser: Miso.Dataset.Parsers.GoogleSpreadsheet,
     key: "0AuSbp2v6xOkPdGw0ampRdjF4Tl9lNm41eFdqOWtZQ1E",
-    worksheet: "1"
+    fast: true,
+    sheetName: "2013"
 });
 
 var requestData = function() {
     createFirstViewingChart();
     createTheatreChart();
+    createFormatChart();
     createGenreChart();
     createMonthChart();
 
     ds.fetch({
         success : function() {
             prepareTheatreData(this);
+            prepareFormatData(this);
             prepareGenreData(this);
             prepareFirstViewingData(this);
             prepareMonthData(this);
@@ -78,7 +82,7 @@ var createPieChart = function(container, title, seriesName) {
             allowPointSelect: true,
             dataLabels: {
                 enabled: true,
-                format: '{point.name} - {percentage:.0f}%'
+                format: '{point.name} - {percentage:.1f}%'
             },
             data: []
         }]
@@ -94,6 +98,11 @@ var createFirstViewingChart = function() {
 var createTheatreChart = function() {
     theatreChart = 
         createPieChart("theatreContainer", "Theatre Frequency", "Visits");
+};
+
+var createFormatChart = function() {
+    formatChart = 
+        createPieChart("formatContainer", "Format", "Viewings");
 };
 
 var createGenreChart = function() {
@@ -162,6 +171,37 @@ var prepareTheatreData = function(data) {
     }
 
     theatreChart.axes[0].setCategories(theatreCategories);
+};
+
+var prepareFormatData = function(data) {
+    var formatThreshold = 0;
+    var formatOtherCount = 0;
+    var formatCategories = [];
+
+    // Pull out the location data
+    data.countBy("Format").each(function(row){ 
+        // add the point
+        if(row.count > formatThreshold) {
+            formatChart.series[0].addPoint({
+                name: row.Format,
+                y: +row.count
+            }, true);
+            formatCategories.push(row.Format);
+        }
+        else {
+            formatOtherCount += row.count;
+        }
+    });
+
+    if(formatOtherCount > 0) {
+        formatChart.series[0].addPoint({
+            name: "Other",
+            y: formatOtherCount
+        }, true);
+        formatCategories.push("Other");
+    }
+
+    formatChart.axes[0].setCategories(formatCategories);
 };
 
 var prepareGenreData = function(data) {
