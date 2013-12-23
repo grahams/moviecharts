@@ -73,13 +73,11 @@ var createPieChart = function(container, title, seriesName) {
         },
         series: [{
             name: seriesName,
-            showInLegend: true,
+            showInLegend: false,
             allowPointSelect: true,
             dataLabels: {
                 enabled: true,
-                color: 'rgb(255,255,255)',
-                distance: -30,
-                format: '{percentage:.0f}%'
+                format: '{point.name} - {percentage:.0f}%'
             },
             data: []
         }]
@@ -111,6 +109,9 @@ var createMonthChart = function () {
             text: "Movies by Month"
         },
         xAxis: {
+            title: {
+                text: "Month"
+            }
         },
         yAxis: {
             title: {
