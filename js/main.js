@@ -51,6 +51,9 @@ var createPieChart = function(container, title, seriesName) {
     var chart = new Highcharts.Chart({
         chart: {
             renderTo: container,
+            height: 600,
+            marginBottom: 150,
+            spacingBottom: 200,
             type: 'pie'
         },
         title: {
@@ -61,10 +64,11 @@ var createPieChart = function(container, title, seriesName) {
         yAxis: {
         },
         legend: {
-            align: "right",
+            align: "center",
             itemWidth: 200,
             width: 200,
-            verticalAlign: "middle"
+            y: 200,
+            verticalAlign: "bottom"
         },
         series: [{
             name: seriesName,
