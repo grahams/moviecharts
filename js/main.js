@@ -229,10 +229,14 @@ var prepareMonthData = function(data) {
 
 var prepareListData = function(data) {
     data.each(function(row) {
-        $("#movieList").append(
-            $("<li />").append(
-                $("<a />", { 'href': row.URL, 'text': row.Title })
-            )
-        );
+        var link = $("<a />", { 'href': row.URL, 
+                                'text': row.Title, 
+                                'title': row.Review  });
+
+        if(row["First Viewing"] !== 'y') {
+            link.css("font-style", "italic");
+        }
+
+        $("#movieList").append($("<li />").append(link));
     });
 };
