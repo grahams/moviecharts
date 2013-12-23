@@ -23,6 +23,7 @@ var requestData = function() {
             prepareGenreData(this);
             prepareFirstViewingData(this);
             prepareMonthData(this);
+            prepareListData(this);
         },
         error : function() {
             // Data loading failed
@@ -224,4 +225,14 @@ var prepareMonthData = function(data) {
     }
 
     monthChart.axes[0].setCategories(monthCategories);
+};
+
+var prepareListData = function(data) {
+    data.each(function(row) {
+        $("#movieList").append(
+            $("<li />").append(
+                $("<a />", { 'href': row.URL, 'text': row.Title })
+            )
+        );
+    });
 };
