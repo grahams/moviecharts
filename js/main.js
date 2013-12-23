@@ -215,14 +215,12 @@ var prepareMonthData = function(data) {
     var monthCategories = [];
 
     for(var x = 0; x < 12; x += 1) {
-        var monthName = moment().month(x).format("MMMM");
-
         monthChart.series[0].addPoint({
-            name: monthName,
+            name: moment().month(x).format("MMMM"),
             y: countMonth(data, x)
         }, true);
 
-        monthCategories.push(monthName);
+        monthCategories.push(moment().month(x).format("MMM"));
     }
 
     monthChart.axes[0].setCategories(monthCategories);
