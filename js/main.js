@@ -6,11 +6,7 @@ var genreChart = null;
 var monthChart = null;
 
 var ds = new Miso.Dataset({
-    importer: Miso.Dataset.Importers.GoogleSpreadsheet,
-    parser: Miso.Dataset.Parsers.GoogleSpreadsheet,
-    key: "0AuSbp2v6xOkPdGw0ampRdjF4Tl9lNm41eFdqOWtZQ1E",
-    fast: true,
-    sheetName: "2013"
+    url: 'data/2013.json'
 });
 
 var requestData = function() {
@@ -111,7 +107,7 @@ var createMonthChart = function () {
     monthChart = new Highcharts.Chart({
         chart: {
             renderTo: "monthContainer",
-            type: 'line'
+            type: 'bar'
         },
         title: {
             text: "Movies by Month"
