@@ -137,14 +137,28 @@ var createMonthChart = function () {
 };
 
 var prepareTheatreData = function(data) {
-    var theatreThreshold = 4;
-    var theatreOtherCount = 0;
     var theatreCategories = [];
+
+    // Folds theatres below a number of visits into a 'Other' category
+    var theatreOtherThreshold = 3;
+    var theatreOtherCount = 0;
+
+    // Folds several 'locations' into 'Home'
+    var theatreCollapseTarget = "Home";
+    var theatreCollapseCount = 0;
+    var theatreCollapseNames = {"Home": true,
+                                "Camp Awesome": true,
+                                "Rochester": true,
+                                "Hopatcong": true,
+                                "Hampton Beach": true};
 
     // Pull out the location data
     data.countBy("Location").each(function(row){ 
         // add the point
-        if(row.count > theatreThreshold) {
+        if(theatreCollapseNames[row.Location] === true) {
+            theatreCollapseCount += +row.count;
+        }
+        else if(row.count > theatreOtherThreshold) {
             theatreChart.series[0].addPoint({
                 name: row.Location,
                 y: +row.count
@@ -155,6 +169,14 @@ var prepareTheatreData = function(data) {
             theatreOtherCount += row.count;
         }
     });
+
+    if(theatreCollapseCount > 0) {
+        theatreChart.series[0].addPoint({
+            name: theatreCollapseTarget,
+            y: theatreCollapseCount
+        }, true);
+        theatreCategories.push(theatreCollapseTarget);
+    }
 
     if(theatreOtherCount > 0) {
         theatreChart.series[0].addPoint({
