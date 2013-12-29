@@ -70,6 +70,29 @@ var createPieChart = function(container, title, seriesName) {
             y: 200,
             verticalAlign: "bottom"
         },
+        tooltip: {
+            formatter: function() {
+                var s = '<b>'+ this.key +'</b>';
+                var chart = this.series.chart;
+                
+                s += '<br/>'+ this.point.series.name +': '+
+                    this.point.y;
+
+                // List the individual components of the 'Other' category
+                // in the tooltip (if any)
+                if(this.key === "Other" && chart.otherNames) {
+                    s = '<b>'+ this.key +'</b>';
+
+                    for(var x = 0; x < chart.otherNames.length; x += 1) {
+                        s += '<br/>'+ chart.otherNames[x] +': '+
+                            chart.otherValues[x];
+                    }
+                }
+                
+                return s;
+            },
+            shared: true
+        },
         series: [{
             name: seriesName,
             showInLegend: false,
@@ -141,6 +164,8 @@ var prepareTheatreData = function(data) {
 
     // Folds theatres below a number of visits into a 'Other' category
     var theatreOtherThreshold = 3;
+    var theatreOtherNames = [];
+    var theatreOtherValues = [];
     var theatreOtherCount = 0;
 
     // Folds several 'locations' into 'Home'
@@ -167,6 +192,8 @@ var prepareTheatreData = function(data) {
         }
         else {
             theatreOtherCount += row.count;
+            theatreOtherNames.push(row.Location);
+            theatreOtherValues.push(row.count);
         }
     });
 
@@ -187,6 +214,8 @@ var prepareTheatreData = function(data) {
     }
 
     theatreChart.axes[0].setCategories(theatreCategories);
+    theatreChart.otherNames = theatreOtherNames;
+    theatreChart.otherValues = theatreOtherValues;
 };
 
 var prepareFormatData = function(data) {
@@ -223,6 +252,10 @@ var prepareFormatData = function(data) {
 var prepareGenreData = function(data) {
     var genreThreshold = 3;
     var genreOtherCount = 0;
+
+    var genreOtherNames = [];
+    var genreOtherValues = [];
+
     var genreCategories = [];
     // Pull out the genre data
     data.countBy("Genre").each(function(row){ 
@@ -235,6 +268,8 @@ var prepareGenreData = function(data) {
         }
         else {
             genreOtherCount += row.count;
+            genreOtherNames.push(row.Genre);
+            genreOtherValues.push(row.count);
         }
     });
 
@@ -247,6 +282,8 @@ var prepareGenreData = function(data) {
     }
 
     genreChart.axes[0].setCategories(genreCategories);
+    genreChart.otherNames = genreOtherNames;
+    genreChart.otherValues = genreOtherValues;
 
 };
 
