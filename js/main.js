@@ -5,66 +5,80 @@ var firstChart = null;
 var genreChart = null;
 var monthChart = null;
 
-var ds = new Miso.Dataset({
-    url: 'data/2013.json',
-    columns : [
-        { 
-            name : "movieTitle", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
+var ds = null;
+
+$(document).ready(function() {
+    var year = "2013";
+    var yearQuery = URI(window.location.href).search(true).year;
+
+    if(yearQuery) {
+        year = yearQuery.replace("/","");
+    }
+
+    ds = new Miso.Dataset({
+        url: 'data/' + year + '.json',
+        columns : [
+            { 
+                name : "movieTitle", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
+            },
+            {
+                name : "viewingDate", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
+            },
+            {
+                name : "movieURL", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
+            },
+            {
+                name : "viewFormat", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
+            },
+            {
+                name : "viewLocation", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
+            },
+            {
+                name : "movieGenre", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
+            },
+            {
+                name : "movieReview", 
+                type : "string", 
+                before : function(v) {
+                    // remove dollar signs and commas
+                    return decodeURIComponent(v);
+                }
             }
-        },
-        {
-            name : "viewingDate", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
-            }
-        },
-        {
-            name : "movieURL", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
-            }
-        },
-        {
-            name : "viewFormat", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
-            }
-        },
-        {
-            name : "viewLocation", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
-            }
-        },
-        {
-            name : "movieGenre", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
-            }
-        },
-        {
-            name : "movieReview", 
-            type : "string", 
-            before : function(v) {
-                // remove dollar signs and commas
-                return decodeURIComponent(v);
-            }
-        }
-    ]
+        ]
+    });
+
+
+    requestData();
 });
 
 var requestData = function() {
@@ -115,10 +129,6 @@ var countMonth = function(data, month) {
     
     return rows.length;
 };
-
-$(document).ready(function() {
-    requestData();
-});
 
 var createPieChart = function(container, title, seriesName) {
     var chart = new Highcharts.Chart({
