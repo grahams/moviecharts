@@ -16,6 +16,19 @@ var requestData = function() {
     createGenreChart();
     createMonthChart();
 
+    $('#theatreControlButton').click(function() {
+        var data  = theatreChart.series[0].data;
+        if(data.length) {
+            for(var x = 0; x < data.length; x += 1) {
+                if(data[x].name === "Home") {
+                    var current = data[x].visible;
+                    data[x].setVisible(!current);
+                    break;
+                }
+            }
+        }
+    });
+
     ds.fetch({
         success : function() {
             prepareTheatreData(this);
@@ -54,6 +67,9 @@ var createPieChart = function(container, title, seriesName) {
             renderTo: container,
             height: 600,
             type: 'pie'
+        },
+        credits: {
+            enabled: false
         },
         title: {
             text: title
