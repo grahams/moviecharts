@@ -6,7 +6,65 @@ var genreChart = null;
 var monthChart = null;
 
 var ds = new Miso.Dataset({
-    url: 'data/2013.json'
+    url: 'data/2013.json',
+    columns : [
+        { 
+            name : "movieTitle", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        },
+        {
+            name : "viewingDate", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        },
+        {
+            name : "movieURL", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        },
+        {
+            name : "viewFormat", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        },
+        {
+            name : "viewLocation", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        },
+        {
+            name : "movieGenre", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        },
+        {
+            name : "movieReview", 
+            type : "string", 
+            before : function(v) {
+                // remove dollar signs and commas
+                return decodeURIComponent(v);
+            }
+        }
+    ]
 });
 
 var requestData = function() {
@@ -51,7 +109,7 @@ var countMonth = function(data, month) {
         columns: ['Date'],
         // and only where the values are > 1
         rows: function(row) {
-            return moment(row.Date).month() === month;
+            return moment(decodeURIComponent(row.viewingDate)).month() === month;
         }
     });
     
@@ -180,7 +238,7 @@ var prepareTextData = function(data) {
     var shortCount = 0;
 
     data.each(function(row){ 
-        if(row.Genre === "Short") {
+        if(decodeURIComponent(row.movieGenre) === "Short") {
             shortCount += 1;
         }
     });
@@ -209,21 +267,21 @@ var prepareTheatreData = function(data) {
                                 "Hampton Beach": true};
 
     // Pull out the location data
-    data.countBy("Location").each(function(row){ 
+    data.countBy("viewLocation").each(function(row){ 
         // add the point
-        if(theatreCollapseNames[row.Location] === true) {
+        if(theatreCollapseNames[row.viewLocation] === true) {
             theatreCollapseCount += +row.count;
         }
         else if(row.count > theatreOtherThreshold) {
             theatreChart.series[0].addPoint({
-                name: row.Location,
+                name: row.viewLocation,
                 y: +row.count
             }, true);
-            theatreCategories.push(row.Location);
+            theatreCategories.push(row.viewLocation);
         }
         else {
             theatreOtherCount += row.count;
-            theatreOtherNames.push(row.Location);
+            theatreOtherNames.push(row.viewLocation);
             theatreOtherValues.push(row.count);
         }
     });
@@ -255,14 +313,14 @@ var prepareFormatData = function(data) {
     var formatCategories = [];
 
     // Pull out the location data
-    data.countBy("Format").each(function(row){ 
+    data.countBy("viewFormat").each(function(row){ 
         // add the point
         if(row.count > formatThreshold) {
             formatChart.series[0].addPoint({
-                name: row.Format,
+                name: row.viewFormat,
                 y: +row.count
             }, true);
-            formatCategories.push(row.Format);
+            formatCategories.push(row.viewFormat);
         }
         else {
             formatOtherCount += row.count;
@@ -289,17 +347,17 @@ var prepareGenreData = function(data) {
 
     var genreCategories = [];
     // Pull out the genre data
-    data.countBy("Genre").each(function(row){ 
+    data.countBy("movieGenre").each(function(row){ 
         if(row.count > genreThreshold) {
             genreChart.series[0].addPoint({
-                name: row.Genre,
+                name: row.movieGenre,
                 y: +row.count
             }, true);
-            genreCategories.push(row.Genre);
+            genreCategories.push(row.movieGenre);
         }
         else {
             genreOtherCount += row.count;
-            genreOtherNames.push(row.Genre);
+            genreOtherNames.push(row.movieGenre);
             genreOtherValues.push(row.count);
         }
     });
@@ -320,8 +378,8 @@ var prepareGenreData = function(data) {
 
 var prepareFirstViewingData = function(data) {
     // Pull out the first/repeat viewing data
-    data.countBy("First Viewing").each(function(row) {
-        if(row["First Viewing"] === 'y') {
+    data.countBy("firstViewing").each(function(row) {
+        if(row.firstViewing === 'y') {
             firstChart.series[0].addPoint({
                 name: "First Viewing",
                 y: +row.count
@@ -353,11 +411,11 @@ var prepareMonthData = function(data) {
 
 var prepareListData = function(data) {
     data.each(function(row) {
-        var link = $("<a />", { 'href': row.URL, 
-                                'text': row.Title, 
-                                'title': row.Review  });
+        var link = $("<a />", { 'href': row.movieURL, 
+                                'text': row.movieTitle, 
+                                'title': row.movieReview  });
 
-        if(row["First Viewing"] !== 'y') {
+        if(row.firstViewing !== 'y') {
             link.css("font-style", "italic");
         }
 
