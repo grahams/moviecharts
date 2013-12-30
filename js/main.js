@@ -31,6 +31,7 @@ var requestData = function() {
 
     ds.fetch({
         success : function() {
+            prepareTextData(this);
             prepareTheatreData(this);
             prepareFormatData(this);
             prepareGenreData(this);
@@ -173,6 +174,20 @@ var createMonthChart = function () {
             data: []
         }]
     });        
+};
+
+var prepareTextData = function(data) {
+    var shortCount = 0;
+
+    data.each(function(row){ 
+        if(row.Genre === "Short") {
+            shortCount += 1;
+        }
+    });
+
+    $("#textStatsTotal").html(data.length);
+    $("#textStatsFeatures").html(data.length - shortCount);
+    $("#textStatsShorts").html(shortCount);
 };
 
 var prepareTheatreData = function(data) {
