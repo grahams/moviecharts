@@ -22,7 +22,6 @@ $(document).ready(function() {
                 name : "movieTitle", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             },
@@ -30,7 +29,6 @@ $(document).ready(function() {
                 name : "viewingDate", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             },
@@ -38,7 +36,6 @@ $(document).ready(function() {
                 name : "movieURL", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             },
@@ -46,7 +43,6 @@ $(document).ready(function() {
                 name : "viewFormat", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             },
@@ -54,7 +50,6 @@ $(document).ready(function() {
                 name : "viewLocation", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             },
@@ -62,7 +57,6 @@ $(document).ready(function() {
                 name : "movieGenre", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             },
@@ -70,7 +64,6 @@ $(document).ready(function() {
                 name : "movieReview", 
                 type : "string", 
                 before : function(v) {
-                    // remove dollar signs and commas
                     return decodeURIComponent(v);
                 }
             }
@@ -123,7 +116,7 @@ var countMonth = function(data, month) {
         columns: ['Date'],
         // and only where the values are > 1
         rows: function(row) {
-            return moment(decodeURIComponent(row.viewingDate)).month() === month;
+            return moment(row.viewingDate).month() === month;
         }
     });
     
@@ -248,7 +241,7 @@ var prepareTextData = function(data) {
     var shortCount = 0;
 
     data.each(function(row){ 
-        if(decodeURIComponent(row.movieGenre) === "Short") {
+        if(row.movieGenre === "Short") {
             shortCount += 1;
         }
     });
