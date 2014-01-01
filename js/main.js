@@ -16,7 +16,7 @@ $(document).ready(function() {
     }
 
     ds = new Miso.Dataset({
-        url: 'data/' + year + '.json',
+        url: '/data/' + year + '.json',
         columns : [
             { 
                 name : "movieTitle", 
