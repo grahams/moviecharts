@@ -8,8 +8,8 @@ var monthChart = null;
 var ds = null;
 
 $(document).ready(function() {
-    var year = "2013";
     var yearQuery = URI(window.location.href).search(true).year;
+    var year = mcYear;
 
     if(yearQuery) {
         year = yearQuery.replace("/","");
