@@ -96,13 +96,27 @@ var requestData = function() {
 
     ds.fetch({
         success : function() {
-            prepareTextData(this);
-            prepareTheatreData(this);
-            prepareFormatData(this);
-            prepareGenreData(this);
-            prepareFirstViewingData(this);
-            prepareMonthData(this);
-            prepareListData(this);
+            if($("#textStats").length > 0) {
+                prepareTextData(this);
+            }
+            if($("#theatreContainer").length > 0) {
+                prepareTheatreData(this);
+            }
+            if($("#formatContainer").length > 0) {
+                prepareFormatData(this);
+            }
+            if($("#genreContainer").length > 0) {
+                prepareGenreData(this);
+            }
+            if($("#firstViewingContainer").length > 0) {
+                prepareFirstViewingData(this);
+            }
+            if($("#monthContainer").length > 0) {
+                prepareMonthData(this);
+            }
+            if($("#movieListDiv").length > 0) {
+                prepareListData(this);
+            }
         },
         error : function() {
             // Data loading failed
@@ -187,54 +201,64 @@ var createPieChart = function(container, title, seriesName) {
 };
 
 var createFirstViewingChart = function() {
-    firstChart = createPieChart("firstViewingContainer", "First Viewing", "Viewings");
+    if($("#firstViewingContainer").length > 0) {
+        firstChart = createPieChart("firstViewingContainer", "First Viewing", "Viewings");
+    }
 };
 
 var createTheatreChart = function() {
-    theatreChart = 
-        createPieChart("theatreContainer", "Theatre Frequency", "Visits");
+    if($("#theatreContainer").length > 0) {
+        theatreChart = 
+            createPieChart("theatreContainer", "Theatre Frequency", "Visits");
+    }
 };
 
 var createFormatChart = function() {
-    formatChart = 
-        createPieChart("formatContainer", "Format", "Viewings");
+    if($("#formatContainer").length > 0) {
+        formatChart = 
+            createPieChart("formatContainer", "Format", "Viewings");
+    }
 };
 
 var createGenreChart = function() {
-    genreChart = createPieChart("genreContainer", "Genres", "Viewings");
+    if($("#genreContainer").length > 0) {
+        genreChart = createPieChart("genreContainer", "Genres", "Viewings");
+    }
 };
 
 var createMonthChart = function () {
-    monthChart = new Highcharts.Chart({
-        chart: {
-            renderTo: "monthContainer",
-            type: 'bar'
-        },
-        title: {
-            text: "Movies by Month"
-        },
-        xAxis: {
+    if($("#monthContainer").length > 0) {
+        monthChart = new Highcharts.Chart({
+            chart: {
+                renderTo: "monthContainer",
+                type: 'bar'
+            },
             title: {
-                text: "Month"
-            }
-        },
-        yAxis: {
-            title: {
-                text: "# Movies"
-            }
-        },
-        legend: {
-            align: "right",
-            itemWidth: 200,
-            width: 200,
-            verticalAlign: "middle"
-        },
-        series: [{
-            name: "Movies",
-            showInLegend: false,
-            data: []
-        }]
-    });        
+                text: "Movies by Month"
+            },
+            xAxis: {
+                title: {
+                    text: "Month"
+                }
+            },
+            yAxis: {
+                title: {
+                    text: "# Movies"
+                }
+            },
+            legend: {
+                align: "right",
+                itemWidth: 200,
+                width: 200,
+                verticalAlign: "middle"
+            },
+            series: [{
+                name: "Movies",
+                showInLegend: false,
+                data: []
+            }]
+        });        
+    }
 };
 
 var prepareTextData = function(data) {
@@ -311,9 +335,12 @@ var prepareTheatreData = function(data) {
 };
 
 var prepareFormatData = function(data) {
-    var formatThreshold = 0;
+    var formatThreshold = 3;
     var formatOtherCount = 0;
     var formatCategories = [];
+
+    var formatOtherNames = [];
+    var formatOtherValues = [];
 
     // Pull out the location data
     data.countBy("viewFormat").each(function(row){ 
@@ -327,6 +354,8 @@ var prepareFormatData = function(data) {
         }
         else {
             formatOtherCount += row.count;
+            formatOtherNames.push(row.viewFormat);
+            formatOtherValues.push(row.count);
         }
     });
 
@@ -339,6 +368,8 @@ var prepareFormatData = function(data) {
     }
 
     formatChart.axes[0].setCategories(formatCategories);
+    formatChart.otherNames = formatOtherNames;
+    formatChart.otherValues = formatOtherValues;
 };
 
 var prepareGenreData = function(data) {
