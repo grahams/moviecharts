@@ -291,6 +291,11 @@ var prepareTheatreData = function(data) {
                                 "Camp Awesome": true,
                                 "Rochester": true,
                                 "Hopatcong": true,
+                                "Michigan": true,
+                                "jwm's house": true,
+                                "Virginia": true,
+                                "Gualala": true,
+                                "Airplane": true,
                                 "Hampton Beach": true};
 
     // Pull out the location data
@@ -413,7 +418,7 @@ var prepareGenreData = function(data) {
 var prepareFirstViewingData = function(data) {
     // Pull out the first/repeat viewing data
     data.countBy("firstViewing").each(function(row) {
-        if(row.firstViewing === 'y') {
+        if(row.firstViewing === 1) {
             firstChart.series[0].addPoint({
                 name: "First Viewing",
                 y: +row.count
@@ -449,7 +454,7 @@ var prepareListData = function(data) {
                                 'text': row.movieTitle, 
                                 'title': row.movieReview  });
 
-        if(row.firstViewing !== 'y') {
+        if(row.firstViewing !== 1) {
             link.css("font-style", "italic");
         }
 
