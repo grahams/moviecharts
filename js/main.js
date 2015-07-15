@@ -6,17 +6,25 @@ var genreChart = null;
 var monthChart = null;
 
 var ds = null;
+var year = null;
+var retry = false;
 
 $(document).ready(function() {
     var yearQuery = URI(window.location.href).search(true).year;
-    var year = mcYear;
+    year = mcYear;
 
     if(yearQuery) {
         year = yearQuery.replace("/","");
     }
 
-    ds = new Miso.Dataset({
-        url: '/data/' + year + '.json',
+    ds = createDataset('/data/' + year + '.json');
+
+    requestData();
+});
+
+var createDataset = function(url) {
+    dataset = new Miso.Dataset({
+        url: url, 
         columns : [
             { 
                 name : "movieTitle", 
@@ -70,9 +78,8 @@ $(document).ready(function() {
         ]
     });
 
-
-    requestData();
-});
+    return dataset;
+};
 
 var requestData = function() {
     createFirstViewingChart();
@@ -119,7 +126,11 @@ var requestData = function() {
             }
         },
         error : function() {
-            // Data loading failed
+            if(!retry) {
+                retry = true;
+                ds = createDataset("/local/moviething/?year=" + year);
+                requestData();
+            }
         }
     });
 };
