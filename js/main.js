@@ -306,6 +306,7 @@ var prepareTheatreData = function(data) {
                                 "jwm's house": true,
                                 "Virginia": true,
                                 "Gualala": true,
+                                "Puerto Rico": true,
                                 "Airplane": true,
                                 "Hampton Beach": true};
 
