@@ -103,6 +103,20 @@ var requestData = function() {
 
     ds.fetch({
         success : function() {
+            this.sort(function(rowA, rowB) {
+                var timeA = new Date(rowA.viewingDate).getTime();
+                var timeB = new Date(rowB.viewingDate).getTime();
+
+                if (timeA < timeB) {
+                    return -1;
+                }
+                if (timeA > timeB) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
             if($("#textStats").length > 0) {
                 prepareTextData(this);
             }
