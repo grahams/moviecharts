@@ -463,10 +463,14 @@ var prepareMonthData = function(data) {
     var monthCategories = [];
 
     for(var x = 0; x < 12; x += 1) {
+        /*
         monthChart.series[0].addPoint({
             name: moment().month(x).format("MMMM"),
             y: countMonth(data, x)
         }, true);
+        */
+        monthChart.series[0].addPoint(countMonth(data,x));
+
 
         monthCategories.push(moment().month(x).format("MMM"));
     }
