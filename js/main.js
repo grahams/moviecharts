@@ -5,7 +5,6 @@ var firstChart = null;
 var genreChart = null;
 var monthChart = null;
 
-var ds = null;
 var year = null;
 var retry = false;
 
@@ -17,71 +16,10 @@ $(document).ready(function() {
         year = yearQuery.replace("/","");
     }
 
-    ds = createDataset('/data/' + year + '.json');
-
-    requestData();
+    requestData('/data/' + year + '.json');
 });
 
-var createDataset = function(url) {
-    dataset = new Miso.Dataset({
-        url: url, 
-        columns : [
-            { 
-                name : "movieTitle", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            },
-            {
-                name : "viewingDate", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            },
-            {
-                name : "movieURL", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            },
-            {
-                name : "viewFormat", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            },
-            {
-                name : "viewLocation", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            },
-            {
-                name : "movieGenre", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            },
-            {
-                name : "movieReview", 
-                type : "string", 
-                before : function(v) {
-                    return decodeURIComponent(v);
-                }
-            }
-        ]
-    });
-
-    return dataset;
-};
-
-var requestData = function() {
+var requestData = function(path) {
     createFirstViewingChart();
     createTheatreChart();
     createFormatChart();
@@ -101,65 +39,66 @@ var requestData = function() {
         }
     });
 
-    ds.fetch({
-        success : function() {
-            this.sort(function(rowA, rowB) {
-                var timeA = new Date(rowA.viewingDate).getTime();
-                var timeB = new Date(rowB.viewingDate).getTime();
+    jQuery.getJSON(path, function(data) {
+        data.sort(function(rowA, rowB) {
+            var timeA = new Date(rowA.viewingDate).getTime();
+            var timeB = new Date(rowB.viewingDate).getTime();
 
-                if (timeA < timeB) {
-                    return -1;
-                }
-                if (timeA > timeB) {
-                    return 1;
-                }
+            if (timeA < timeB) {
+                return -1;
+            }
+            if (timeA > timeB) {
+                return 1;
+            }
 
-                return 0;
-            });
+            return 0;
+        });
 
-            if($("#textStats").length > 0) {
-                prepareTextData(this);
-            }
-            if($("#theatreContainer").length > 0) {
-                prepareTheatreData(this);
-            }
-            if($("#formatContainer").length > 0) {
-                prepareFormatData(this);
-            }
-            if($("#genreContainer").length > 0) {
-                prepareGenreData(this);
-            }
-            if($("#firstViewingContainer").length > 0) {
-                prepareFirstViewingData(this);
-            }
-            if($("#monthContainer").length > 0) {
-                prepareMonthData(this);
-            }
-            if($("#movieListDiv").length > 0) {
-                prepareListData(this);
-            }
-        },
-        error : function() {
-            if(!retry) {
-                retry = true;
-                ds = createDataset("/local/moviething/?year=" + year);
-                requestData();
-            }
+        if($("#textStats").length > 0) {
+            prepareTextData(data);
         }
-    });
+
+        if($("#formatContainer").length > 0) {
+            prepareFormatData(data);
+        }
+
+        if($("#theatreContainer").length > 0) {
+            prepareTheatreData(data);
+        }
+
+        if($("#firstViewingContainer").length > 0) {
+            prepareFirstViewingData(data);
+        }
+
+        if($("#genreContainer").length > 0) {
+            prepareGenreData(data);
+        }
+
+        if($("#monthContainer").length > 0) {
+            prepareMonthData(data);
+        }
+
+        if($("#movieListDiv").length > 0) {
+            prepareListData(data);
+        }
+    }).fail(function() {
+        if(!retry) {
+            retry = true;
+            requestData("/local/moviething/?year=" + year);
+        }
+    }) 
 };
 
 var countMonth = function(data, month) {
-    var rows = data.where({
-        // copy over the one column
-        columns: ['Date'],
-        // and only where the values are > 1
-        rows: function(row) {
-            return moment(row.viewingDate).month() === month;
+    var monthCount = 0;
+
+    data.forEach(function(row){ 
+        if(moment(row.viewingDate).month() === month) {
+            monthCount += 1;
         }
     });
-    
-    return rows.length;
+
+    return monthCount;
 };
 
 var createPieChart = function(container, title, seriesName) {
@@ -289,7 +228,7 @@ var createMonthChart = function () {
 var prepareTextData = function(data) {
     var shortCount = 0;
 
-    data.each(function(row){ 
+    data.forEach(function(row){ 
         if(row.movieGenre === "Short") {
             shortCount += 1;
         }
@@ -300,10 +239,62 @@ var prepareTextData = function(data) {
     $("#textStatsShorts").html(shortCount);
 };
 
+
+var countByWithOther = function(data, key, chart) {
+    var categories = [];
+
+    var otherThreshold = 3;
+    var otherCount = 0;
+    var otherNames = [];
+    var otherValues = [];
+
+    var totals = {};
+
+    data.forEach(function(row){ 
+        var k = row[key];
+        if(totals[k] === undefined) {
+            totals[k] = 1;
+        }
+        else {
+            totals[k] += 1;
+        }
+    });
+
+    // Pull out the location data
+    for(var v in totals) {
+        if(totals[v] <= otherThreshold) {
+            otherCount += totals[v];
+            otherNames.push(v);
+            otherValues.push(totals[v]);
+            delete totals[v];
+        }
+        else {
+            chart.series[0].addPoint({
+                name: v,
+                y: totals[v]
+            }, true);
+            categories.push(v);
+        }
+    }
+
+    if(otherCount > 0) {
+        chart.series[0].addPoint({
+            name: "Other",
+            y: otherCount
+        }, true);
+        categories.push("Other");
+    }
+
+    chart.axes[0].setCategories(categories);
+    chart.otherNames = otherNames;
+    chart.otherValues = otherValues;
+};
+
 var prepareTheatreData = function(data) {
     var theatreCategories = [];
 
     // Folds theatres below a number of visits into a 'Other' category
+    var theatreOtherTarget = "Other";
     var theatreOtherThreshold = 3;
     var theatreOtherNames = [];
     var theatreOtherValues = [];
@@ -324,32 +315,40 @@ var prepareTheatreData = function(data) {
                                 "Airplane": true,
                                 "Hampton Beach": true};
 
-    // Pull out the location data
-    data.countBy("viewLocation").each(function(row){ 
-        // add the point
+    // Compute theatre totals
+    var theatreTotals = {};
+    theatreTotals[theatreCollapseTarget] = 0;
+
+    data.forEach(function(row){ 
         if(theatreCollapseNames[row.viewLocation] === true) {
-            theatreCollapseCount += +row.count;
-        }
-        else if(row.count > theatreOtherThreshold) {
-            theatreChart.series[0].addPoint({
-                name: row.viewLocation,
-                y: +row.count
-            }, true);
-            theatreCategories.push(row.viewLocation);
+            theatreCollapseCount += 1;
+            theatreTotals[theatreCollapseTarget] += 1;
         }
         else {
-            theatreOtherCount += row.count;
-            theatreOtherNames.push(row.viewLocation);
-            theatreOtherValues.push(row.count);
+            if(theatreTotals[row.viewLocation] === undefined) {
+                theatreTotals[row.viewLocation] = 1;
+            }
+            else {
+                theatreTotals[row.viewLocation] += 1;
+            }
         }
     });
 
-    if(theatreCollapseCount > 0) {
-        theatreChart.series[0].addPoint({
-            name: theatreCollapseTarget,
-            y: theatreCollapseCount
-        }, true);
-        theatreCategories.push(theatreCollapseTarget);
+    // Pull out the location data
+    for(var theatre in theatreTotals) {
+        if(theatreTotals[theatre] <= theatreOtherThreshold) {
+            theatreOtherCount += theatreTotals[theatre];
+            theatreOtherNames.push(theatre);
+            theatreOtherValues.push(theatreTotals[theatre]);
+            delete theatreTotals[theatre];
+        }
+        else {
+            theatreChart.series[0].addPoint({
+                name: theatre,
+                y: theatreTotals[theatre]
+            }, true);
+            theatreCategories.push(theatre);
+        }
     }
 
     if(theatreOtherCount > 0) {
@@ -366,97 +365,35 @@ var prepareTheatreData = function(data) {
 };
 
 var prepareFormatData = function(data) {
-    var formatThreshold = 3;
-    var formatOtherCount = 0;
-    var formatCategories = [];
-
-    var formatOtherNames = [];
-    var formatOtherValues = [];
-
-    // Pull out the location data
-    data.countBy("viewFormat").each(function(row){ 
-        // add the point
-        if(row.count > formatThreshold) {
-            formatChart.series[0].addPoint({
-                name: row.viewFormat,
-                y: +row.count
-            }, true);
-            formatCategories.push(row.viewFormat);
-        }
-        else {
-            formatOtherCount += row.count;
-            formatOtherNames.push(row.viewFormat);
-            formatOtherValues.push(row.count);
-        }
-    });
-
-    if(formatOtherCount > 0) {
-        formatChart.series[0].addPoint({
-            name: "Other",
-            y: formatOtherCount
-        }, true);
-        formatCategories.push("Other");
-    }
-
-    formatChart.axes[0].setCategories(formatCategories);
-    formatChart.otherNames = formatOtherNames;
-    formatChart.otherValues = formatOtherValues;
+    countByWithOther(data, "viewFormat", formatChart);
 };
 
 var prepareGenreData = function(data) {
-    var genreThreshold = 3;
-    var genreOtherCount = 0;
-
-    var genreOtherNames = [];
-    var genreOtherValues = [];
-
-    var genreCategories = [];
-    // Pull out the genre data
-    data.countBy("movieGenre").each(function(row){ 
-        if(row.count > genreThreshold) {
-            genreChart.series[0].addPoint({
-                name: row.movieGenre,
-                y: +row.count
-            }, true);
-            genreCategories.push(row.movieGenre);
-        }
-        else {
-            genreOtherCount += row.count;
-            genreOtherNames.push(row.movieGenre);
-            genreOtherValues.push(row.count);
-        }
-    });
-
-    if(genreOtherCount > 0) {
-        genreChart.series[0].addPoint({
-            name: "Other",
-            y: genreOtherCount
-        }, true);
-        genreCategories.push("Other");
-    }
-
-    genreChart.axes[0].setCategories(genreCategories);
-    genreChart.otherNames = genreOtherNames;
-    genreChart.otherValues = genreOtherValues;
-
+    countByWithOther(data, "movieGenre", genreChart);
 };
 
 var prepareFirstViewingData = function(data) {
+    var firstViewing = 0;
+    var repeatViewing = 0;
+
     // Pull out the first/repeat viewing data
-    data.countBy("firstViewing").each(function(row) {
+    data.forEach(function(row) {
         if(row.firstViewing === 1) {
-            firstChart.series[0].addPoint({
-                name: "First Viewing",
-                y: +row.count
-            }, true);
+            firstViewing += 1;
         }
         else {
-            firstChart.series[0].addPoint({
-                name: "Repeat Viewing",
-                y: +row.count
-            }, true);
+            repeatViewing += 1;
         }
     });
+
+    firstChart.series[0].addPoint({
+        name: "First Viewing",
+        y: +firstViewing
+    }, true);
+    firstChart.series[0].addPoint({
+        name: "Repeat Viewing",
+        y: +repeatViewing
+    }, true);
 };
 
 var prepareMonthData = function(data) {
@@ -479,7 +416,7 @@ var prepareMonthData = function(data) {
 };
 
 var prepareListData = function(data) {
-    data.each(function(row) {
+    data.forEach(function(row) {
         var link = $("<a />", { 'href': row.movieURL, 
                                 'text': row.movieTitle, 
                                 'title': row.movieReview  });
