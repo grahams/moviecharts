@@ -16,7 +16,7 @@ $(document).ready(function() {
         year = yearQuery.replace("/","");
     }
 
-    requestData('/data/' + year + '.json');
+    requestData('/local/moviecharts/data/' + year + '.json');
 });
 
 var requestData = function(path) {
