@@ -307,6 +307,7 @@ var prepareTheatreData = function(data) {
                                 "Camp Awesome": true,
                                 "Rochester": true,
                                 "Hopatcong": true,
+                                "McWeavers": true,
                                 "Michigan": true,
                                 "jwm's house": true,
                                 "Virginia": true,
