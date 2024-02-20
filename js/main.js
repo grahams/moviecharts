@@ -418,8 +418,14 @@ var prepareMonthData = function(data) {
 
 var prepareListData = function(data) {
     data.forEach(function(row) {
+        var title = row.movieTitle;
+
+        if(row.movieGenre === "Short") {
+            title = "Short: " + title;
+        }
+
         var link = $("<a />", { 'href': row.movieURL, 
-                                'text': row.movieTitle, 
+                                'text': title, 
                                 'title': row.movieReview  });
 
         if(row.firstViewing !== 1) {
